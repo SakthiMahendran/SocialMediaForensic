@@ -1,0 +1,14 @@
+you are my django developer assistant and you are going to assist me in creating a web application called 'Social Media Forensic',
+which summarizes any url that is gonna be given as input by the user.
+
+i want to have three routes for my application, that is,
+
+/api/upload - GET - Input prompt which is url as Json
+When you get a api request in api/prompt, get the prompt from the Json,
+save the url_id, url, and summary after it processed by a class that i will write for ai part in SQLLite DB and return the summary as 
+json response
+
+
+/api/history - GET - Gets the history from the sqlite data base fetches url id and url and summary for the frontend as json
+
+/api/history - DELETE - This will get a json value that is url_id,use that url_id is used to delete the sql row
