@@ -1,0 +1,152 @@
+.signup-container {
+    background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+    min-height: 100vh;
+    min-width: 100vw;
+    display: flex;
+    align-items: center;
+    margin-left: 0px;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .signup-container::before,
+  .signup-container::after {
+    content: '';
+    position: absolute;
+    width: 1500px;
+    height: 1500px;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  
+  .signup-container::before {
+    background: linear-gradient(45deg, #304ffe 0%, #1e88e5 100%);
+    top: -50%;
+    right: -20%;
+    animation: float1 15s infinite alternate;
+  }
+  
+  .signup-container::after {
+    background: linear-gradient(45deg, #1e88e5 0%, #304ffe 100%);
+    bottom: -50%;
+    left: -20%;
+    animation: float2 18s infinite alternate;
+  }
+  
+  @keyframes float1 {
+    from { transform: rotate(0deg) translate(0, 0); }
+    to { transform: rotate(180deg) translate(50px, 50px); }
+  }
+  
+  @keyframes float2 {
+    from { transform: rotate(0deg) translate(0, 0); }
+    to { transform: rotate(-180deg) translate(-50px, -50px); }
+  }
+  
+  .signup-paper {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px !important;
+    padding: 2rem !important;
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    width: 100%;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .signup-paper:hover {
+    transform: translateY(-5px);
+  }
+  
+  .signup-title {
+    background: linear-gradient(45deg, #304ffe, #1e88e5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 2.5rem !important;
+    margin-bottom: 1.5rem !important;
+    animation: titleGlow 2s ease-in-out infinite alternate;
+  }
+  
+  .signup-input {
+    margin: 0.8rem 0 !important;
+  }
+  
+  .signup-input .MuiOutlinedInput-root {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+  }
+  
+  .signup-input .MuiOutlinedInput-root:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .password-strength {
+    margin: 1rem 0;
+  }
+  
+  .password-strength-bar {
+    height: 8px !important;
+    border-radius: 4px !important;
+  }
+  
+  .password-requirements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .requirement-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .signup-button {
+    background: linear-gradient(45deg, #304ffe, #1e88e5) !important;
+    border-radius: 10px !important;
+    text-transform: none !important;
+    font-size: 1.1rem !important;
+    padding: 0.8rem !important;
+    margin: 1.5rem 0 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .signup-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  .login-link {
+    color: #304ffe !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .login-link:hover {
+    color: #1e88e5 !important;
+  }
+  
+  @media (max-width: 600px) {
+    .signup-paper {
+      padding: 1.5rem !important;
+    }
+  
+    .signup-title {
+      font-size: 2rem !important;
+    }
+  
+    .password-requirements {
+      grid-template-columns: 1fr;
+    }
+  }

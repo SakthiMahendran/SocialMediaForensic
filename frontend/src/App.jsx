@@ -1,23 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Paper, 
-  TextField, 
-  Button, 
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  Container,
+  Typography,
+  Paper,
+  TextField,
+  Button,
   Box,
   Card,
   CardContent,
   IconButton,
   Snackbar,
   CircularProgress,
-  Alert
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import LinkIcon from '@mui/icons-material/Link';
-import HistoryIcon from '@mui/icons-material/History';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import './App.css';
+  Alert,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LinkIcon from "@mui/icons-material/Link";
+import HistoryIcon from "@mui/icons-material/History";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import "./App.css";
+
+// Import LoginPage and SignUpPage
+import LoginPage from "./components/LoginPage";
+import SignUpPage from "./components/SignUpPage";
 
 // Backend URL directly embedded here
 const BACKEND_URL = "http://127.0.0.1:8000";
@@ -25,22 +30,22 @@ const BACKEND_URL = "http://127.0.0.1:8000";
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: "#1976d2",
     },
     secondary: {
-      main: '#dc004e',
+      main: "#dc004e",
     },
   },
 });
 
 function App() {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState("");
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
 
   useEffect(() => {
@@ -50,37 +55,37 @@ function App() {
   const fetchHistory = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/history/`);
-      if (!response.ok) throw new Error('Failed to fetch history');
+      if (!response.ok) throw new Error("Failed to fetch history");
       const data = await response.json();
-      setHistory(data.history); // Access `history` from JSON response
+      setHistory(data.history);
     } catch (error) {
-      showSnackbar('Error fetching history', 'error');
+      showSnackbar("Error fetching history", "error");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url) {
-      showSnackbar('Please enter a URL', 'error');
+      showSnackbar("Please enter a URL", "error");
       return;
     }
-  
+
     setLoading(true);
     try {
       const response = await fetch(`${BACKEND_URL}/api/upload/`, {
-        method: 'POST', // Use POST to send URL in body
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url }), // Send the URL in the body
+        body: JSON.stringify({ url }),
       });
-  
-      if (!response.ok) throw new Error('Failed to process URL');
+
+      if (!response.ok) throw new Error("Failed to process URL");
       await fetchHistory();
-      setUrl('');
-      showSnackbar('URL analyzed successfully!', 'success');
+      setUrl("");
+      showSnackbar("URL analyzed successfully!", "success");
     } catch (error) {
-      showSnackbar('Error processing URL', 'error');
+      showSnackbar("Error processing URL", "error");
     } finally {
       setLoading(false);
     }
@@ -89,18 +94,18 @@ function App() {
   const handleDelete = async (urlId) => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/history/`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ url_id: urlId }),
       });
 
-      if (!response.ok) throw new Error('Failed to delete entry');
+      if (!response.ok) throw new Error("Failed to delete entry");
       await fetchHistory();
-      showSnackbar('Entry deleted successfully!', 'success');
+      showSnackbar("Entry deleted successfully!", "success");
     } catch (error) {
-      showSnackbar('Error deleting entry', 'error');
+      showSnackbar("Error deleting entry", "error");
     }
   };
 
@@ -108,114 +113,186 @@ function App() {
     setSnackbar({
       open: true,
       message,
-      severity
+      severity,
     });
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="app-background">
-        <div className="animated-background">
-          <div className="particle p1"></div>
-          <div className="particle p2"></div>
-          <div className="particle p3"></div>
-          <div className="particle p4"></div>
-          <div className="particle p5"></div>
-        </div>
-        
-        <Box className="main-wrapper">
-          <Container maxWidth="lg" className="main-container">
-            <Paper elevation={24} className="main-content-card">
-              <Box sx={{ p: 4 }}>
-                <Typography variant="h3" component="h1" gutterBottom align="center" className="title-gradient">
-                  Social Media Forensic
-                </Typography>
-                <Typography variant="h6" color="textSecondary" align="center" sx={{ mb: 4 }}>
-                  Enter a URL to get its summary
-                </Typography>
+      <Router>
+        <Routes>
+          {/* Login Page */}
+          <Route path="/" element={<LoginPage />} />
 
-                <Paper elevation={3} sx={{ p: 3, mb: 4 }} className="input-section">
-                  <form onSubmit={handleSubmit}>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                      <TextField
-                        fullWidth
-                        label="Enter URL"
-                        variant="outlined"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        disabled={loading}
-                        placeholder="https://example.com"
-                      />
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        size="large"
-                        disabled={loading}
-                        startIcon={loading ? <CircularProgress size={20} /> : <LinkIcon />}
-                      >
-                        Analyze
-                      </Button>
-                    </Box>
-                  </form>
-                </Paper>
+          {/* SignUp Page */}
+          <Route path="/signup" element={<SignUpPage />} />
 
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <HistoryIcon sx={{ mr: 1 }} />
-                  <Typography variant="h5">Analysis History</Typography>
-                </Box>
+          {/* Main Page */}
+          <Route
+            path="/home"
+            element={
+              <div className="app-background">
+                <div className="animated-background">
+                  <div className="particle p1"></div>
+                  <div className="particle p2"></div>
+                  <div className="particle p3"></div>
+                  <div className="particle p4"></div>
+                  <div className="particle p5"></div>
+                </div>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {history.length === 0 ? (
-                    <Typography variant="body1" color="textSecondary" align="center">
-                      No history available yet. Start by analyzing a URL!
-                    </Typography>
-                  ) : (
-                    history.map((item) => (
-                      <Card key={item.url_id} elevation={2}>
-                        <CardContent>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <Box sx={{ flex: 1 }}>
-                              <Typography variant="subtitle1" component="div">
-                                {item.url}
-                              </Typography>
-                              <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                                {item.summary}
-                              </Typography>
+                <Box className="main-wrapper">
+                  <Container maxWidth="lg" className="main-container">
+                    <Paper elevation={24} className="main-content-card">
+                      <Box sx={{ p: 4 }}>
+                        <Typography
+                          variant="h3"
+                          component="h1"
+                          gutterBottom
+                          align="center"
+                          className="title-gradient"
+                        >
+                          Social Media Forensic
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          color="textSecondary"
+                          align="center"
+                          sx={{ mb: 4 }}
+                        >
+                          Enter a URL to get its summary
+                        </Typography>
+
+                        <Paper
+                          elevation={3}
+                          sx={{ p: 3, mb: 4 }}
+                          className="input-section"
+                        >
+                          <form onSubmit={handleSubmit}>
+                            <Box sx={{ display: "flex", gap: 2 }}>
+                              <TextField
+                                fullWidth
+                                label="Enter URL"
+                                variant="outlined"
+                                value={url}
+                                onChange={(e) => setUrl(e.target.value)}
+                                disabled={loading}
+                                placeholder="https://example.com"
+                              />
+                              <Button
+                                type="submit"
+                                variant="contained"
+                                size="large"
+                                disabled={loading}
+                                startIcon={
+                                  loading ? (
+                                    <CircularProgress size={20} />
+                                  ) : (
+                                    <LinkIcon />
+                                  )
+                                }
+                              >
+                                Analyze
+                              </Button>
                             </Box>
-                            <IconButton
-                              onClick={() => handleDelete(item.url_id)}
-                              color="error"
-                              sx={{ ml: 2 }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
-                </Box>
-              </Box>
-            </Paper>
-          </Container>
-        </Box>
+                          </form>
+                        </Paper>
 
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        >
-          <Alert
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-            severity={snackbar.severity}
-            variant="filled"
-            sx={{ width: '100%' }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      </div>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                        >
+                          <HistoryIcon sx={{ mr: 1 }} />
+                          <Typography variant="h5">Analysis History</Typography>
+                        </Box>
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          {history.length === 0 ? (
+                            <Typography
+                              variant="body1"
+                              color="textSecondary"
+                              align="center"
+                            >
+                              No history available yet. Start by analyzing a
+                              URL!
+                            </Typography>
+                          ) : (
+                            history.map((item) => (
+                              <Card key={item.url_id} elevation={2}>
+                                <CardContent>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "flex-start",
+                                    }}
+                                  >
+                                    <Box sx={{ flex: 1 }}>
+                                      <Typography
+                                        variant="subtitle1"
+                                        component="div"
+                                      >
+                                        {item.url}
+                                      </Typography>
+                                      <Typography
+                                        variant="body1"
+                                        color="text.secondary"
+                                        sx={{ mt: 1 }}
+                                      >
+                                        {item.summary}
+                                      </Typography>
+                                    </Box>
+                                    <IconButton
+                                      onClick={() =>
+                                        handleDelete(item.url_id)
+                                      }
+                                      color="error"
+                                      sx={{ ml: 2 }}
+                                    >
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </Box>
+                                </CardContent>
+                              </Card>
+                            ))
+                          )}
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </Container>
+                </Box>
+
+                <Snackbar
+                  open={snackbar.open}
+                  autoHideDuration={6000}
+                  onClose={() =>
+                    setSnackbar({ ...snackbar, open: false })
+                  }
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                  }}
+                >
+                  <Alert
+                    onClose={() =>
+                      setSnackbar({ ...snackbar, open: false })
+                    }
+                    severity={snackbar.severity}
+                    variant="filled"
+                    sx={{ width: "100%" }}
+                  >
+                    {snackbar.message}
+                  </Alert>
+                </Snackbar>
+              </div>
+            }
+          />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }

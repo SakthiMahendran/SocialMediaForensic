@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import {
   Box,
+  Container,
   TextField,
   Button,
   Typography,
@@ -15,41 +16,39 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { AuthContext } from "./AuthProvider";
+import "./LoginPage.css";
 
 const LoginPage = () => {
-  const { login } = useContext(AuthContext); // Use AuthContext for global authentication state
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ username: "", password: "" });
-  const [error, setError] = useState(null); // Error message state
-  const [showPassword, setShowPassword] = useState(false); // Password visibility toggle
-  const [isLoading, setIsLoading] = useState(false); // Loading state for button
+  const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
-
-    // Clear error on user input
     setError(null);
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
     if (!credentials.username || !credentials.password) {
       setError("Both username and password are required.");
       return;
     }
 
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
     try {
       const response = await axiosInstance.post("/api/login/", credentials);
-
-      // On success, update authentication state and navigate to home
-      login(response.data); // Save token or user info in AuthContext
-      navigate("/home"); // Redirect to the home page
+      login(response.data);
+      navigate("/home");
     } catch (err) {
       const backendError = err.response?.data?.error || "Login failed. Please try again.";
       setError(backendError);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -57,102 +56,95 @@ const LoginPage = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const isDisabled = !credentials.username || !credentials.password || isLoading; // Disable button if fields are empty or loading
-
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minHeight="100vh"
-      bgcolor="#f5f5f5"
-      padding="1rem"
-    >
-      <Paper
-        elevation={3}
-        sx={{
-          padding: "2rem",
-          width: "100%",
-          maxWidth: "400px",
-          borderRadius: "12px",
-          textAlign: "center",
-          backgroundColor: "white",
-        }}
-      >
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Welcome Back!
-        </Typography>
-        <Typography variant="body1" color="textSecondary" marginBottom="1.5rem">
-          Please login to continue
-        </Typography>
+    <Box className="login-wrapper">
+      <div className="animated-background">
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
+        <div className="shape shape-3"></div>
+      </div>
 
-        {error && (
-          <Alert
-            severity="error"
-            sx={{ marginBottom: "1rem" }}
-            onClose={() => setError(null)}
-          >
-            {error}
-          </Alert>
-        )}
+      <Container maxWidth="sm" className="login-container">
+        <Paper elevation={3} className="login-paper">
+          <Box>
+            <Typography variant="h4" className="login-title">
+              Welcome Back!
+            </Typography>
+            <Typography variant="body1" className="login-subtitle">
+              Please login to continue
+            </Typography>
 
-        <TextField
-          label="Username"
-          name="username"
-          value={credentials.username}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          disabled={isLoading}
-        />
-        <TextField
-          label="Password"
-          name="password"
-          type={showPassword ? "text" : "password"}
-          value={credentials.password}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          disabled={isLoading}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={togglePasswordVisibility} edge="end">
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleLogin}
-          disabled={isDisabled}
-          sx={{
-            marginTop: "1.5rem",
-            height: "48px",
-            fontSize: "1rem",
-          }}
-        >
-          {isLoading ? <CircularProgress size={24} color="inherit" /> : "Login"}
-        </Button>
+            {error && (
+              <Alert
+                severity="error"
+                className="login-alert"
+                onClose={() => setError(null)}
+              >
+                {error}
+              </Alert>
+            )}
 
-        <Typography variant="body2" marginTop="1.5rem">
-          Don't have an account?{" "}
-          <MuiLink
-            component={Link}
-            to="/signup"
-            color="primary"
-            underline="hover"
-            sx={{ fontWeight: "bold" }}
-          >
-            Sign Up
-          </MuiLink>
-        </Typography>
-      </Paper>
+            <form onSubmit={handleLogin}>
+              <TextField
+                label="Username"
+                name="username"
+                value={credentials.username}
+                onChange={handleInputChange}
+                fullWidth
+                className="login-input"
+                disabled={isLoading}
+                required
+              />
+
+              <TextField
+                label="Password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={credentials.password}
+                onChange={handleInputChange}
+                fullWidth
+                className="login-input"
+                disabled={isLoading}
+                required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                        className="password-toggle"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={isLoading}
+                className="login-button"
+              >
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+              </Button>
+            </form>
+
+            <Typography variant="body2" className="signup-text">
+              Don't have an account?{" "}
+              <MuiLink
+                component={Link}
+                to="/signup"
+                className="signup-link"
+              >
+                Sign Up
+              </MuiLink>
+            </Typography>
+          </Box>
+        </Paper>
+      </Container>
     </Box>
   );
 };

@@ -4,6 +4,7 @@ import {
   TextField,
   Button,
   Typography,
+  Paper,
   InputAdornment,
   IconButton,
   Alert,
@@ -13,7 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Check, X } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
-import CenteredContainer from "./CenteredContainer";
+import './SignUpPage.css';
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ const SignUpPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" })); // Clear field-specific errors
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSignUp = async () => {
@@ -56,12 +57,16 @@ const SignUpPage = () => {
     setSuccessMessage("");
 
     const newErrors = {};
-    if (!validateEmail(formData.email)) newErrors.email = "Please enter a valid email address.";
+    if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
     const passwordChecks = validatePassword(formData.password);
-    if (!Object.values(passwordChecks).every(Boolean))
+    if (!Object.values(passwordChecks).every(Boolean)) {
       newErrors.password = "Password doesn't meet all requirements.";
-    if (formData.password !== formData.confirmPassword)
+    }
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -93,157 +98,157 @@ const SignUpPage = () => {
   const passwordStrength = getPasswordStrength(formData.password);
 
   return (
-    <CenteredContainer>
-      <Typography variant="h4" gutterBottom align="center" sx={{ mb: 3 }}>
-        Create Account
-      </Typography>
+    <div className="signup-container">
+      <div className="signup-background-shapes">
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
+        <div className="shape shape-3"></div>
+      </div>
 
-      {successMessage && (
-        <Alert
-          severity="success"
-          sx={{ mb: 2 }}
-          onClose={() => setSuccessMessage("")}
-        >
-          {successMessage}
-        </Alert>
-      )}
+      <Paper elevation={3} className="signup-paper">
+        <Typography variant="h4" className="signup-title">
+          Create Account
+        </Typography>
 
-      {errors.submit && (
-        <Alert
-          severity="error"
-          sx={{ mb: 2 }}
-          onClose={() => setErrors((prev) => ({ ...prev, submit: "" }))}
-        >
-          {errors.submit}
-        </Alert>
-      )}
+        {successMessage && (
+          <Alert
+            severity="success"
+            className="signup-alert"
+            onClose={() => setSuccessMessage("")}
+          >
+            {successMessage}
+          </Alert>
+        )}
 
-      <TextField
-        label="Username"
-        name="username"
-        value={formData.username}
-        onChange={handleInputChange}
-        fullWidth
-        margin="normal"
-        error={!!errors.username}
-        helperText={errors.username}
-        disabled={isLoading}
-      />
+        {errors.submit && (
+          <Alert
+            severity="error"
+            className="signup-alert"
+            onClose={() => setErrors((prev) => ({ ...prev, submit: "" }))}
+          >
+            {errors.submit}
+          </Alert>
+        )}
 
-      <TextField
-        label="Email"
-        name="email"
-        value={formData.email}
-        onChange={handleInputChange}
-        fullWidth
-        margin="normal"
-        error={!!errors.email}
-        helperText={errors.email}
-        disabled={isLoading}
-      />
+        <TextField
+          label="Username"
+          name="username"
+          value={formData.username}
+          onChange={handleInputChange}
+          fullWidth
+          className="signup-input"
+          error={!!errors.username}
+          helperText={errors.username}
+          disabled={isLoading}
+        />
 
-      <TextField
-        label="Password"
-        name="password"
-        type={showPassword ? "text" : "password"}
-        value={formData.password}
-        onChange={handleInputChange}
-        fullWidth
-        margin="normal"
-        error={!!errors.password}
-        helperText={errors.password}
-        disabled={isLoading}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+        <TextField
+          label="Email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          fullWidth
+          className="signup-input"
+          error={!!errors.email}
+          helperText={errors.email}
+          disabled={isLoading}
+        />
 
-      {formData.password && (
-        <Box sx={{ mb: 2 }}>
-          <LinearProgress
-            variant="determinate"
-            value={passwordStrength}
-            sx={{
-              mb: 1,
-              height: 8,
-              borderRadius: 1,
-              backgroundColor: "grey.200",
-              "& .MuiLinearProgress-bar": {
-                backgroundColor:
-                  passwordStrength <= 40
-                    ? "error.main"
-                    : passwordStrength <= 80
-                    ? "warning.main"
-                    : "success.main",
-              },
-            }}
-          />
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1 }}>
-            {Object.entries(validatePassword(formData.password)).map(([key, valid]) => (
-              <Box key={key} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                {valid ? <Check size={16} color="green" /> : <X size={16} color="red" />}
-                <Typography
-                  variant="caption"
-                  color={valid ? "success.main" : "error.main"}
+        <TextField
+          label="Password"
+          name="password"
+          type={showPassword ? "text" : "password"}
+          value={formData.password}
+          onChange={handleInputChange}
+          fullWidth
+          className="signup-input"
+          error={!!errors.password}
+          helperText={errors.password}
+          disabled={isLoading}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="password-toggle"
                 >
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      )}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-      <TextField
-        label="Confirm Password"
-        name="confirmPassword"
-        type={showConfirmPassword ? "text" : "password"}
-        value={formData.confirmPassword}
-        onChange={handleInputChange}
-        fullWidth
-        margin="normal"
-        error={!!errors.confirmPassword}
-        helperText={errors.confirmPassword}
-        disabled={isLoading}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+        {formData.password && (
+          <div className="password-strength">
+            <LinearProgress
+              variant="determinate"
+              value={passwordStrength}
+              className="password-strength-bar"
+            />
+            <div className="password-requirements">
+              {Object.entries(validatePassword(formData.password)).map(([key, valid]) => (
+                <div key={key} className="requirement-item">
+                  {valid ? (
+                    <Check size={16} className="check-icon" />
+                  ) : (
+                    <X size={16} className="x-icon" />
+                  )}
+                  <Typography
+                    variant="caption"
+                    className={valid ? "requirement-met" : "requirement-unmet"}
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </Typography>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        onClick={handleSignUp}
-        disabled={isLoading}
-        sx={{
-          mt: 3,
-          mb: 2,
-          height: 48,
-        }}
-      >
-        {isLoading ? <CircularProgress size={24} color="inherit" /> : "Create Account"}
-      </Button>
+        <TextField
+          label="Confirm Password"
+          name="confirmPassword"
+          type={showConfirmPassword ? "text" : "password"}
+          value={formData.confirmPassword}
+          onChange={handleInputChange}
+          fullWidth
+          className="signup-input"
+          error={!!errors.confirmPassword}
+          helperText={errors.confirmPassword}
+          disabled={isLoading}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="password-toggle"
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-      <Typography variant="body2" align="center">
-        Already have an account?{" "}
-        <Link to="/" style={{ color: "#1976d2", textDecoration: "none" }}>
-          Login
-        </Link>
-      </Typography>
-    </CenteredContainer>
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={handleSignUp}
+          disabled={isLoading}
+          className="signup-button"
+        >
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : "Create Account"}
+        </Button>
+
+        <Typography variant="body2" className="login-text">
+          Already have an account?{" "}
+          <Link to="/" className="login-link">
+            Login
+          </Link>
+        </Typography>
+      </Paper>
+    </div>
   );
 };
 
