@@ -1,44 +1,47 @@
-from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import ForensicData
-import json
-from django.contrib.auth.hashers import make_password, check_password
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.hashers import make_password, check_password
+import json
 from .models import ForensicData, User
 from .serializers import UserSerializer
+from .handlers import AiHandler  # Import the AiHandler class
 
-# Class for AI processing (replace this with your implementation)
-class AIProcessor:
-    @staticmethod
-    def process_url(url):
-        # Placeholder AI logic
-        return f"Summary for {url}"
+# Initialize AiHandler instance
+ai_handler = AiHandler()
 
 @csrf_exempt
 def upload_url(request):
-    if request.method == 'POST':  # Changed to POST to accept body
+    if request.method == 'POST':  # Accept POST requests for URL processing
         try:
             data = json.loads(request.body)  # Parse the JSON body
             url = data.get('url')  # Extract 'url' from the request body
+
             if not url:
                 return JsonResponse({"error": "URL is required"}, status=400)
 
-            # Process the URL and save to the database
-            summary = AIProcessor.process_url(url)
+            # Process the URL using AiHandler
+            extracted_content = ai_handler.extract_url(url)
+            forensic_report = ai_handler.gen_forensic_report(extracted_content)
+
+            # Save to the database
             forensic_data, created = ForensicData.objects.get_or_create(
-                url=url, defaults={"summary": summary}
+                url=url, defaults={"summary": forensic_report}
             )
-            return JsonResponse({"url_id": forensic_data.url_id, "url": url, "summary": summary})
+
+            return JsonResponse(
+                {"url_id": forensic_data.url_id, "url": url, "summary": forensic_report}
+            )
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
     return JsonResponse({"error": "Invalid HTTP method"}, status=405)
+
 
 @csrf_exempt
 def history(request):
@@ -49,19 +52,18 @@ def history(request):
         try:
             data = json.loads(request.body)  # Parse the JSON body
             url_id = data.get('url_id')
+
             if not url_id:
                 return JsonResponse({"error": "URL ID is required"}, status=400)
 
             forensic_data = get_object_or_404(ForensicData, url_id=url_id)
             forensic_data.delete()
+
             return JsonResponse({"message": "Deleted successfully"})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
     return JsonResponse({"error": "Invalid HTTP method"}, status=405)
-
-    
-
-
 
 
 class SignUpView(APIView):
@@ -79,12 +81,11 @@ class SignUpView(APIView):
                 serializer.save()
                 return Response({'message': 'User created successfully!'}, status=status.HTTP_201_CREATED)
             else:
-                print("Serializer errors:", serializer.errors)  # Debug serializer errors
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            print("Error during signup:", str(e))  # Debug unexpected errors
             return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class LoginView(APIView):
     permission_classes = [AllowAny]  # Allow unauthenticated access

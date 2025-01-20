@@ -41,7 +41,7 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post("/api/login/", credentials);
+      const response = await axiosInstance.post("/login/", credentials);
       login(response.data);
       navigate("/home");
     } catch (err) {

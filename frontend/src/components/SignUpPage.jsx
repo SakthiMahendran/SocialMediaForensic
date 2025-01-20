@@ -75,7 +75,7 @@ const SignUpPage = () => {
 
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post("/api/signup/", {
+      const response = await axiosInstance.post("/signup/", {
         username: formData.username,
         email: formData.email,
         password: formData.password,
